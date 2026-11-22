@@ -1,0 +1,161 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nuzividu | Municipal GIS</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><style>
+:root{--navy:#122c46;--ink:#1e3348;--muted:#64748b;--line:#e4eaf0;--bg:#f5f7fb;--blue:#1c68a5}*{box-sizing:border-box}body{margin:0;font:13px 'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--ink)}
+header{height:66px;background:var(--navy);color:white;display:flex;align-items:center;justify-content:space-between;padding:0 22px;gap:12px}header h1{font-size:20px;margin:0;letter-spacing:.2px}header small{color:#bbd0e2;font-size:11px}header .tag{font-size:11px;border:1px solid #65839e;border-radius:30px;padding:7px 11px}
+main{display:grid;grid-template-columns:355px minmax(0,1fr);height:calc(100vh - 66px)}aside{overflow-y:auto;padding:16px;background:white;border-right:1px solid var(--line)}#map{height:100%;width:100%}.panel{border:1px solid var(--line);border-radius:11px;padding:14px;margin-bottom:13px;background:white;box-shadow:0 1px 2px #152c4410}.panel h2{font-size:13px;margin:0 0 11px;color:#163956}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.metric{background:#f1f6fa;padding:10px 7px;border-radius:7px}.metric b{display:block;font-size:18px;color:#153a58}.metric span{font-size:10px;color:#5e7081}.field{margin:10px 0}label{display:block;font-size:11px;font-weight:650;margin:0 0 5px}input,select{width:100%;padding:9px;border:1px solid #cbd6df;border-radius:7px;background:white;color:var(--ink);font:inherit}input:focus,select:focus{outline:2px solid #a6cce9}button{background:#185b8c;color:white;border:0;border-radius:7px;padding:9px 12px;cursor:pointer;font:inherit;font-weight:600}button:hover{background:#0f476f}.ghost{background:#e9eff5;color:#2a4b64}.ghost:hover{background:#d8e5ee}.flex{display:flex;gap:7px;align-items:center}.flex>*{flex:1}.small{font-size:11px;color:#66798a;line-height:1.5}.results{max-height:180px;overflow:auto;margin-top:7px;border:1px solid #e7ebf0;border-radius:7px;display:none}.result{padding:9px;border-bottom:1px solid #e9edf1;cursor:pointer;font-size:12px}.result:hover{background:#eaf4fb}.result small{display:block;color:#718093}.legend-item{display:flex;gap:8px;align-items:center;margin:6px 0;font-size:11px}.sw{width:12px;height:12px;border-radius:3px;border:1px solid #0002;flex:none}.legend-head{font-weight:650;font-size:11px;margin:10px 0 5px}.leaflet-popup-content{max-height:260px;overflow:auto;min-width:190px}.attrs{border-collapse:collapse;width:100%;font-size:11px}.attrs td{border-bottom:1px solid #e9eef2;padding:4px}.attrs td:first-child{font-weight:600;color:#50657a}.pill{font-size:10px;color:#8a5a00;background:#fff4d9;padding:4px 6px;border-radius:5px}.switch{display:flex;align-items:center;gap:8px;font-size:12px;margin:9px 0}.switch input{width:auto}.leaflet-tooltip.landmark-label{background:#fffef4;color:#19344b;border:1px solid #c5d3df;box-shadow:0 1px 3px #0002;font-size:10px;padding:2px 5px}.footer{font-size:10px;color:#7b8a9a;line-height:1.5;padding:3px 5px}.loading{position:absolute;z-index:900;right:18px;bottom:20px;background:white;padding:10px 14px;border-radius:8px;box-shadow:0 2px 12px #0002;font-size:12px}
+@media(max-width:780px){header{height:auto;min-height:62px}header h1{font-size:16px}header .tag{display:none}main{display:flex;flex-direction:column;height:auto}aside{max-height:48vh}#map{height:65vh}}
+
+/* Final GIS interface refinements */
+#map{position:relative}.leaflet-control-layers{border:1px solid #d6e0ea!important;border-radius:12px!important;box-shadow:0 4px 22px #172f4b26!important;background:#fff!important;max-height:min(68vh,560px);overflow:auto;font:12px 'Segoe UI',Arial,sans-serif!important}
+.leaflet-control-layers-expanded{padding:12px 14px!important;min-width:230px}.leaflet-control-layers-list label{display:flex!important;align-items:center!important;margin:0!important;padding:6px 4px!important;cursor:pointer;font-size:12px!important;font-weight:500!important;line-height:1.3!important}
+.leaflet-control-layers-list label:hover{background:#eef5fb;border-radius:6px}.leaflet-control-layers-list label span{display:flex;align-items:center;gap:9px;min-width:0}.leaflet-control-layers-list label input{margin:0!important;flex:none;width:16px;height:16px;accent-color:#1667a0}.leaflet-control-layers-separator{margin:9px 0!important;border-top:1px solid #dce6ee!important}.leaflet-control-layers-base:before{content:'BASEMAP';display:block;font-size:10px;font-weight:750;letter-spacing:1px;color:#73879b;margin:3px 0 7px}.leaflet-control-layers-overlays:before{content:'MAP LAYERS';display:block;font-size:10px;font-weight:750;letter-spacing:1px;color:#73879b;margin:10px 0 7px}
+.map-legend{position:absolute;z-index:500;bottom:18px;left:16px;background:#fffefcf2;max-width:245px;max-height:40vh;overflow:auto;padding:12px 14px;border-radius:11px;box-shadow:0 3px 16px #0002;border:1px solid #e1e8ee;pointer-events:auto}.map-legend-title{font-size:12px;font-weight:750;color:#183d5d;margin-bottom:8px}.map-legend .legend-item{font-size:11px;margin:5px 0}.map-legend .legend-head{font-size:11px;margin-top:8px}.analysis-results{font-size:12px;color:#35516b;line-height:1.6;margin-top:10px}.analysis-results .measure{padding:8px 10px;background:#edf5fb;border-radius:7px;margin:5px 0}.analysis-results b{color:#143d5e}.map-legend .sw{width:11px;height:11px}
+@media(max-width:780px){.map-legend{bottom:12px;left:10px;max-width:190px;max-height:30vh}.leaflet-control-layers-expanded{min-width:185px}}
+</style></head><body>
+<header><div><h1>Nuzividu Municipal GIS</h1><small>Land, buildings and urban infrastructure</small></div><div class="tag">Spatial inventory · Interactive map</div></header>
+<main><aside>
+<section class="panel"><h2>Overview</h2><div class="metrics"><div class="metric"><b>15,819</b><span>Parcels</span></div><div class="metric"><b>16,658</b><span>Buildings</span></div><div class="metric"><b>2,133</b><span>Roads</span></div><div class="metric"><b>25</b><span>Revenue wards</span></div><div class="metric"><b>1,142</b><span>Landmarks</span></div><div class="metric"><b>1</b><span>Municipality</span></div></div></section>
+<section class="panel"><h2>Find a property</h2><div class="field"><label for="searchType">Search by</label><select id="searchType"><option value="PCL_ID">Parcel ID</option><option value="OLD_H_NO">House number</option><option value="BLD_ID">Building ID</option></select></div><div class="field"><label for="searchText">Number or starting digits</label><input id="searchText" placeholder="Type 1, 2, 3 or more digits" autocomplete="off"></div><div class="flex"><button id="searchBtn">Find matches</button><button class="ghost" id="clearSearch">Clear</button></div><div id="searchMessage" class="small" style="margin-top:7px"></div><div id="searchResults" class="results"></div></section>
+<section class="panel"><h2>Attribute filters</h2><div class="field"><label for="filterLayer">Dataset</label><select id="filterLayer"><option value="Parcel">Parcels</option><option value="Buildings">Buildings</option></select></div><div class="field"><label for="landuse">Land use (LUSE_DET)</label><select id="landuse"><option value="">All land uses</option></select></div><div class="field"><label for="ward">Revenue ward</label><select id="ward"><option value="">All wards</option></select></div><div class="flex"><button id="applyFilter">Apply filters</button><button class="ghost" id="resetFilter">Reset</button></div><div id="filterCount" class="small" style="margin-top:8px"></div></section>
+<section class="panel"><h2>Building colours</h2><div class="field"><label for="buildingStyle">Colour buildings by</label><select id="buildingStyle"><option value="LUSE_DET">Land use</option><option value="WARD_ID">Revenue ward</option><option value="none">Single colour</option></select></div><label class="switch"><input id="labelToggle" type="checkbox"> Show landmark names</label><div class="small">Labels appear at closer zoom levels to keep the map readable.</div></section>
+<section class="panel"><h2>Map key</h2><p class="small">The map legend updates with the visible area.</p><div id="legend" style="display:none"></div></section>
+<section class="panel"><h2>Site surroundings</h2><div class="field"><label for="siteId">Parcel ID</label><input id="siteId" placeholder="Enter a complete parcel ID"></div><button id="siteCheck">Find nearby features</button><button class="ghost" id="siteClear" type="button">Clear map</button><div id="siteResult" class="analysis-results"></div></section>
+<section class="panel"><h2>Road buffer analysis</h2><div class="field"><label for="roadQuery">Road name or road ID</label><input id="roadQuery" placeholder="Start typing a road name or ID"></div><div class="field"><label for="roadChoice">Select road segment</label><select id="roadChoice"><option value="">Enter a road name above</option></select></div><div class="field"><label for="bufferSize">Buffer distance</label><select id="bufferSize"><option value="25">25 metres</option><option value="50">50 metres</option><option value="100" selected>100 metres</option><option value="200">200 metres</option><option value="500">500 metres</option></select></div><button id="runBuffer">Create buffer &amp; count parcels</button><button class="ghost" id="clearBuffer">Clear</button><div id="bufferResult" class="analysis-results"></div><p class="small">Counts parcels intersecting the selected road segment buffer. A parcel may only partly overlap.</p></section>
+<div class="footer">Source layers: user-provided GIS data. Demonstration-only ownership, occupancy and slum attributes are identified as sample records in their popups. Map CRS: WGS 84.</div>
+</aside><div id="map"><div id="mapLegend" class="map-legend"><div class="map-legend-title">Visible map legend</div><div id="mapLegendItems"></div></div></div></main><div id="loading" class="loading">Loading GIS layers…</div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+<script>
+const map=L.map('map',{preferCanvas:true,zoomControl:false}).setView([16.78,80.85],13);L.control.zoom({position:'bottomright'}).addTo(map);
+const base={
+'No basemap':L.layerGroup(),
+'OpenStreetMap':L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:20,attribution:'© OpenStreetMap contributors'}),
+'Carto Light':L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:20,attribution:'© OpenStreetMap · © CARTO'}),
+'Carto Dark':L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:20,attribution:'© OpenStreetMap · © CARTO'})
+};base.OpenStreetMap.addTo(map);
+let raw={},layers={},index=[],control=null,selectedLanduse='',activeFilterLayer='Parcel',landmarkLabels=false;
+const fileNames=['MunicipalBoundary','RevenueWardBoundary','RoadNetwork','Parcel','Buildings','Landmarks','GovernmentLandSample','GovernmentBuildingSample','SlumSampleSynthetic'];
+const palette=['#2f80a9','#e6a04b','#8a6bc5','#53a48e','#c77386','#7a9c50','#b66c40','#a49a51','#5c8ec7','#b47f9b','#64748b','#b78d64'];
+function hash(s){let h=0;for(let c of String(s||'Unknown'))h=(h*31+c.charCodeAt(0))>>>0;return h%palette.length}
+function color(v){return palette[hash(v)]}
+function safe(s){return String(s??'—').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function popup(f,name){let rows=Object.entries(f.properties||{}).filter(([k,v])=>v!==null&&v!==''&&k!=='geometry_status').slice(0,25).map(([k,v])=>'<tr><td>'+safe(k)+'</td><td>'+safe(v)+'</td></tr>').join('');let evidence=(name==='Parcel'&&String(f.properties?.PCL_ID)==='100018000500001')?'<p><b>Linked GIS review:</b> <a href="../evidence/Desktop_Observation_001.json" target="_blank">Desktop observation record 001</a></p>':'';let warn=name.includes('Sample')?'<p class="pill">Demonstration attributes — not field verified</p>':'';return '<b>'+safe(name)+'</b>'+warn+evidence+'<table class="attrs">'+rows+'</table>'}
+function layerStyle(f,name){let p=f.properties||{};if(name==='MunicipalBoundary')return {color:'#183d60',weight:3,fillOpacity:0};
+if(name==='RevenueWardBoundary')return {color:'#8d6ed0',weight:1.2,fillOpacity:0,dashArray:'5 5'};
+if(name==='RoadNetwork')return {color:'#d28b34',weight:1.8,opacity:.9};
+if(name==='Parcel')return {color:'#b6a277',weight:.5,fillColor:color(p.LUSE_DET),fillOpacity:.4};
+if(name==='Buildings'){let attr=document.getElementById('buildingStyle').value;return {color:'#35485d',weight:.35,fillColor:attr==='none'?'#697f95':color(p[attr]),fillOpacity:.78}}
+if(name==='GovernmentLandSample')return {color:'#136a50',weight:1.5,fillColor:'#38a87e',fillOpacity:.45};
+if(name==='GovernmentBuildingSample')return {color:'#9b3b76',weight:1.5,fillColor:'#e38ac0',fillOpacity:.55};
+if(name==='SlumSampleSynthetic')return {color:'#c45b49',weight:1.5,fillColor:'#f3b0a2',fillOpacity:.4,dashArray:'5 3'};
+return {color:'#147a8e',fillColor:'#147a8e',fillOpacity:.9,weight:1};}
+function buildLayer(name,features){return L.geoJSON({type:'FeatureCollection',features},{style:f=>layerStyle(f,name),pointToLayer:(f,ll)=>L.circleMarker(ll,{radius:4,color:'#0c6177',weight:1,fillColor:'#1691a9',fillOpacity:.9}),onEachFeature:(f,l)=>{l.bindPopup(()=>popup(f,name));if(name==='Landmarks'){let text=f.properties.LM_NAME||f.properties.LM_TYPE;if(text)l.bindTooltip(safe(text),{permanent:true,direction:'top',offset:[0,-5],className:'landmark-label',opacity:.9})}}})}
+function rebuildControl(){if(control)map.removeControl(control);control=L.control.layers(base,{'Municipal boundary':layers.MunicipalBoundary,'Revenue wards':layers.RevenueWardBoundary,'Road network':layers.RoadNetwork,'Parcels':layers.Parcel,'Buildings':layers.Buildings,'Landmarks':layers.Landmarks,'Govt land · sample fields':layers.GovernmentLandSample,'Govt buildings · sample fields':layers.GovernmentBuildingSample,'Slum locations · synthetic':layers.SlumSampleSynthetic},{collapsed:true}).addTo(map);}
+function renderLegend(){let box=document.getElementById('legend'),h='<div class="legend-item"><i class="sw" style="background:#d28b34"></i>Roads</div><div class="legend-item"><i class="sw" style="background:#8d6ed0"></i>Revenue wards</div><div class="legend-item"><i class="sw" style="background:#147a8e"></i>Landmarks</div><div class="legend-item"><i class="sw" style="background:#38a87e"></i>Government land (sample)</div><div class="legend-item"><i class="sw" style="background:#f3b0a2"></i>Slum area (synthetic)</div>';let dataset=activeFilterLayer==='Buildings'?'Buildings':'Parcel';let attr=dataset==='Buildings'?document.getElementById('buildingStyle').value:'LUSE_DET';if(attr==='none'){h+='<div class="legend-head">Buildings</div><div class="legend-item"><i class="sw" style="background:#697f95"></i>Building footprints</div>'}else{let vals=[...new Set((raw[dataset]?.features||[]).map(f=>String(f.properties[attr]??'Unknown')))];if(selectedLanduse&&attr==='LUSE_DET')vals=vals.filter(v=>v===selectedLanduse);vals.sort((a,b)=>a.localeCompare(b));h+='<div class="legend-head">'+safe(dataset)+' · '+safe(attr)+'</div>'+vals.slice(0,30).map(v=>'<div class="legend-item"><i class="sw" style="background:'+color(v)+'"></i>'+safe(v)+'</div>').join('');if(vals.length>30)h+='<div class="small">+'+(vals.length-30)+' more categories</div>'}box.innerHTML=h}
+function updateFilterOptions(){let n=document.getElementById('filterLayer').value,d=raw[n];if(!d)return;for(let [id,key] of [['landuse','LUSE_DET'],['ward','WARD_ID']]){let s=document.getElementById(id),prev=s.value,values=[...new Set(d.features.map(f=>String(f.properties[key]??'Unknown')))].sort((a,b)=>a.localeCompare(b));s.innerHTML='<option value=\"\">All '+(id==='ward'?'wards':'land uses')+'</option>';values.forEach(v=>{let o=document.createElement('option');o.value=v;o.textContent=v;s.appendChild(o)});if(values.includes(prev))s.value=prev}}
+function applyFilter(){let name=document.getElementById('filterLayer').value;activeFilterLayer=name;let lu=document.getElementById('landuse').value,ward=document.getElementById('ward').value;selectedLanduse=lu;let features=raw[name].features.filter(f=>(!lu||String(f.properties.LUSE_DET??'Unknown')===lu)&&(!ward||String(f.properties.WARD_ID??'Unknown')===ward));let old=layers[name],shown=map.hasLayer(old);map.removeLayer(old);layers[name]=buildLayer(name,features);if(shown)layers[name].addTo(map);rebuildControl();renderLegend();document.getElementById('filterCount').textContent=features.length.toLocaleString()+' of '+raw[name].features.length.toLocaleString()+' features shown'}
+function findMatches(){let field=document.getElementById('searchType').value,q=document.getElementById('searchText').value.trim().toLowerCase(),list=document.getElementById('searchResults'),msg=document.getElementById('searchMessage');list.innerHTML='';if(!q){msg.textContent='Enter a number to search.';list.style.display='none';return}let n=field==='PCL_ID'?'Parcel':'Buildings',items=raw[n].features.filter(f=>String(f.properties[field]??'').toLowerCase().startsWith(q));msg.textContent=items.length.toLocaleString()+' matching records'+(items.length>50?' · first 50 shown':'');list.style.display='block';items.slice(0,50).forEach(f=>{let el=document.createElement('div');el.className='result';el.innerHTML='<b>'+safe(f.properties[field])+'</b><small>'+safe(f.properties.LOCALITY||f.properties.ROAD_NAME||f.properties.RD_NAME||'')+'</small>';el.onclick=()=>{let center=L.geoJSON(f).getBounds();map.fitBounds(center.pad(1.2),{maxZoom:18});let popupLayer=L.geoJSON(f,{style:()=>({color:'#1569b2',weight:3,fillColor:'#2b9cff',fillOpacity:.55}),onEachFeature:(f,l)=>l.bindPopup(()=>popup(f,n))}).addTo(map);setTimeout(()=>{let layer=popupLayer.getLayers()[0];if(layer)layer.openPopup()},100);setTimeout(()=>map.removeLayer(popupLayer),14000)};list.appendChild(el)});}
+function nearestRoad(){let q=document.getElementById('siteId').value.trim(),target=raw.Parcel.features.find(f=>String(f.properties.PCL_ID)===q),box=document.getElementById('siteResult');if(!target){box.textContent='Enter a complete valid parcel ID.';return}let pt=L.geoJSON(target).getBounds().getCenter(),min=Infinity,closest=null;let roads=raw.RoadNetwork.features;for(let road of roads){let geom=road.geometry;if(!geom)continue;let lines=geom.type==='LineString'?[geom.coordinates]:geom.type==='MultiLineString'?geom.coordinates:[];for(let line of lines)for(let coord of line){let ll=L.latLng(coord[1],coord[0]),dist=pt.distanceTo(ll);if(dist<min){min=dist;closest=ll}}}if(!closest){box.textContent='Road geometry unavailable';return}let group=L.featureGroup([L.circleMarker(pt,{radius:7,color:'#176bb2'}),L.polyline([pt,closest],{color:'#176bb2',dashArray:'5 5',weight:3})]).addTo(map);map.fitBounds(group.getBounds().pad(.8));box.textContent='Approx. distance to nearest road vertex: '+Math.round(min)+' m. Screening estimate only.';setTimeout(()=>map.removeLayer(group),18000)}
+Promise.all(fileNames.map(async n=>{let res=await fetch('../data/processed/'+n+'.geojson');if(!res.ok)throw Error(n+' not found');return [n,await res.json()]})).then(arr=>{arr.forEach(([n,d])=>raw[n]=d);fileNames.forEach(n=>{layers[n]=buildLayer(n,raw[n].features);if(['MunicipalBoundary','RevenueWardBoundary','RoadNetwork','Parcel','Buildings','Landmarks'].includes(n))layers[n].addTo(map)});layers.Landmarks.eachLayer(l=>l.closeTooltip());rebuildControl();updateFilterOptions();renderLegend();map.fitBounds(layers.MunicipalBoundary.getBounds().pad(.04));document.getElementById('loading').style.display='none';}).catch(e=>{document.getElementById('loading').textContent='Unable to load data: '+e.message+'. Start run_app.bat.';console.error(e)});
+document.getElementById('searchBtn').onclick=findMatches;document.getElementById('searchText').oninput=()=>{if(document.getElementById('searchText').value.trim().length>=2)findMatches()};document.getElementById('searchText').onkeydown=e=>{if(e.key==='Enter')findMatches()};
+document.getElementById('clearSearch').onclick=()=>{document.getElementById('searchText').value='';document.getElementById('searchResults').style.display='none';document.getElementById('searchMessage').textContent=''};
+document.getElementById('filterLayer').onchange=()=>{updateFilterOptions();activeFilterLayer=document.getElementById('filterLayer').value;renderLegend()};
+document.getElementById('applyFilter').onclick=applyFilter;
+document.getElementById('resetFilter').onclick=()=>{document.getElementById('landuse').value='';document.getElementById('ward').value='';applyFilter()};
+document.getElementById('buildingStyle').onchange=()=>{if(layers.Buildings){layers.Buildings.setStyle(f=>layerStyle(f,'Buildings'));renderLegend()}};
+document.getElementById('labelToggle').onchange=e=>{landmarkLabels=e.target.checked;if(layers.Landmarks)layers.Landmarks.eachLayer(l=>{if(landmarkLabels&&map.getZoom()>=15)l.openTooltip();else l.closeTooltip()})};
+map.on('zoomend',()=>{if(layers.Landmarks)layers.Landmarks.eachLayer(l=>{if(landmarkLabels&&map.getZoom()>=15)l.openTooltip();else l.closeTooltip()})});
+document.getElementById('siteCheck').onclick=nearestRoad;
+
+// Enhanced analysis and map interactions (real geometry, no invented distances).
+let homeBounds=null,siteGraphics=null,bufferGraphics=null;
+function clearGraphics(which){if(which==='site'&&siteGraphics){map.removeLayer(siteGraphics);siteGraphics=null;}if(which==='buffer'&&bufferGraphics){map.removeLayer(bufferGraphics);bufferGraphics=null;}}
+function asPoint(f){return turf.centroid(f)}
+function metresToRoad(pt,road){return turf.pointToLineDistance(pt,road,{units:'meters'});}
+function pointToLatLng(pt){return [pt.geometry.coordinates[1],pt.geometry.coordinates[0]];}
+function featureBounds(f){return L.geoJSON(f).getBounds()}
+function nearestSite(){
+ const q=document.getElementById('siteId').value.trim(),el=document.getElementById('siteResult');
+ if(!raw.Parcel){el.textContent='GIS data is still loading.';return;}
+ const parcel=raw.Parcel.features.find(f=>String(f.properties.PCL_ID)===q);
+ if(!parcel){el.textContent='Parcel not found. Enter the complete ID from the search results.';return;}
+ clearGraphics('site');let pt=asPoint(parcel),pLL=pointToLatLng(pt);
+ let closestRoad=null,roadDist=Infinity,major=null,majorDist=Infinity;
+ for(const road of raw.RoadNetwork.features){if(!road.geometry)continue;let dist;try{dist=metresToRoad(pt,road)}catch(e){continue}
+ if(dist<roadDist){roadDist=dist;closestRoad=road;}
+ // Source RD_TYPE 01/02 used as *screening* main-road candidates; classification unverified.
+ if(['01','02','1','2'].includes(String(road.properties.RD_TYPE??''))&&dist<majorDist){majorDist=dist;major=road;}}
+ let nearestLandmark=null,landmarkDist=Infinity;
+ for(const lm of raw.Landmarks.features){if(!lm.geometry||lm.geometry.type!=='Point')continue;const d=turf.distance(pt,lm,{units:'meters'});if(d<landmarkDist){landmarkDist=d;nearestLandmark=lm;}}
+ const fg=L.featureGroup().addTo(map);siteGraphics=fg;
+ L.geoJSON(parcel,{style:{color:'#1762a3',weight:3,fillColor:'#38a6ef',fillOpacity:.5}}).addTo(fg);
+ L.circleMarker(pLL,{radius:6,color:'#1762a3',fillColor:'#fff',fillOpacity:1}).addTo(fg);
+ if(closestRoad)L.geoJSON(closestRoad,{style:{color:'#e39a36',weight:5}}).addTo(fg);
+ if(major)L.geoJSON(major,{style:{color:'#d44b4b',weight:5}}).addTo(fg);
+ if(nearestLandmark)L.geoJSON(nearestLandmark,{pointToLayer:(f,ll)=>L.circleMarker(ll,{radius:8,color:'#126e71',fillColor:'#36b8b0',fillOpacity:1})}).addTo(fg);
+ const rname=closestRoad?String(closestRoad.properties.RD_NAME||'Unnamed road'):'Not available';
+ const mname=major?String(major.properties.RD_NAME||'Unnamed major-road candidate'):'Not available';
+ const lname=nearestLandmark?String(nearestLandmark.properties.LM_NAME||nearestLandmark.properties.LM_TYPE||'Unnamed landmark'):'Not available';
+ el.innerHTML='<div class="measure"><b>Nearest mapped road</b><br>'+safe(rname)+' · '+Math.round(roadDist)+' m</div>'+
+ '<div class="measure"><b>Nearest main-road candidate</b><br>'+safe(mname)+(major?' · '+Math.round(majorDist)+' m':'')+'</div>'+
+ '<div class="measure"><b>Nearest landmark</b><br>'+safe(lname)+(nearestLandmark?' · '+Math.round(landmarkDist)+' m':'')+'</div>'+
+ '<div class="small">Straight-line distances from the parcel centroid. Main-road candidates use source RD_TYPE codes 01/02; confirm the road classification with the data owner.</div>';
+ map.fitBounds(fg.getBounds().pad(.35),{maxZoom:17});
+}
+function updateRoadChoices(){const q=document.getElementById('roadQuery').value.trim().toLowerCase(),sel=document.getElementById('roadChoice');sel.innerHTML='';if(!q){sel.innerHTML='<option value="">Enter a road name or ID</option>';return;}
+ const matches=[];raw.RoadNetwork.features.forEach((f,i)=>{let p=f.properties||{};if(String(p.RD_NAME||'').toLowerCase().includes(q)||String(p.RD_ID||'').toLowerCase().startsWith(q))matches.push([i,p]);});
+ if(!matches.length){sel.innerHTML='<option value="">No matching road segments</option>';return;}
+ matches.slice(0,100).forEach(([i,p])=>{let opt=document.createElement('option');opt.value=i;opt.textContent=(p.RD_NAME||'Unnamed road')+' · ID '+(p.RD_ID||i);sel.appendChild(opt)});
+}
+function roadBuffer(){const box=document.getElementById('bufferResult'),index=document.getElementById('roadChoice').value;
+ if(index===''||!raw.RoadNetwork){box.textContent='Choose a road segment first.';return;}
+ if(typeof turf==='undefined'){box.textContent='Spatial analysis library did not load. Check your internet connection.';return;}
+ const road=raw.RoadNetwork.features[Number(index)],distance=Number(document.getElementById('bufferSize').value);
+ clearGraphics('buffer');box.textContent='Calculating parcels intersecting the buffer…';
+ try{
+ const poly=turf.buffer(road,distance,{units:'meters',steps:12});const bounds=turf.bbox(poly);
+ let count=0,area=0;const touched=[];
+ for(const f of raw.Parcel.features){if(!f.geometry)continue;const bb=turf.bbox(f);if(bb[2]<bounds[0]||bb[0]>bounds[2]||bb[3]<bounds[1]||bb[1]>bounds[3])continue;
+ try{if(turf.booleanIntersects(poly,f)){count++;touched.push(f);area+=Number(f.properties.area_calc_sqm)||0;}}catch(e){}
+ }
+ const group=L.featureGroup().addTo(map);bufferGraphics=group;
+ L.geoJSON(poly,{style:{color:'#1963a3',weight:2,fillColor:'#53a7e2',fillOpacity:.28}}).addTo(group);
+ L.geoJSON(road,{style:{color:'#d55b35',weight:5}}).addTo(group);
+ // Render parcel outlines only when count is manageable, for browser responsiveness.
+ if(touched.length<=1200)L.geoJSON({type:'FeatureCollection',features:touched},{style:{color:'#2d7c58',weight:1,fillOpacity:0}}).addTo(group);
+ map.fitBounds(group.getBounds().pad(.2));
+ box.innerHTML='<div class="measure"><b>'+count.toLocaleString()+' parcels</b> intersect the '+distance+' m road buffer.</div><div class="small">Selected segment: '+safe(road.properties.RD_NAME||'Unnamed road')+' (ID '+safe(road.properties.RD_ID||index)+'). Count is by geometric intersection, including partial overlaps. Not an ownership assessment.</div>';
+ }catch(e){box.textContent='Buffer analysis failed: '+e.message;console.error(e)}
+}
+function visibleLegend(){const el=document.getElementById('mapLegendItems');if(!el||!raw.Parcel)return;
+ const bounds=map.getBounds();let markup='';
+ if(map.hasLayer(layers.MunicipalBoundary))markup+='<div class="legend-item"><i class="sw" style="background:#183d60"></i>Municipal boundary</div>';
+ if(map.hasLayer(layers.RevenueWardBoundary))markup+='<div class="legend-item"><i class="sw" style="background:#8d6ed0"></i>Revenue wards</div>';
+ if(map.hasLayer(layers.RoadNetwork))markup+='<div class="legend-item"><i class="sw" style="background:#d28b34"></i>Roads</div>';
+ if(map.hasLayer(layers.Landmarks))markup+='<div class="legend-item"><i class="sw" style="background:#147a8e"></i>Landmarks</div>';
+ if(map.hasLayer(layers.GovernmentLandSample))markup+='<div class="legend-item"><i class="sw" style="background:#38a87e"></i>Govt land · sample</div>';
+ if(map.hasLayer(layers.GovernmentBuildingSample))markup+='<div class="legend-item"><i class="sw" style="background:#e38ac0"></i>Govt buildings · sample</div>';
+ if(map.hasLayer(layers.SlumSampleSynthetic))markup+='<div class="legend-item"><i class="sw" style="background:#f3b0a2"></i>Slum · synthetic</div>';
+ for(const name of ['Parcel','Buildings']){if(!layers[name]||!map.hasLayer(layers[name]))continue;
+ const attr=name==='Parcel'?'LUSE_DET':document.getElementById('buildingStyle').value;
+ if(attr==='none'){markup+='<div class="legend-head">Buildings</div><div class="legend-item"><i class="sw" style="background:#697f95"></i>Building footprints</div>';continue;}
+ const values=new Set();layers[name].eachLayer(l=>{if(!l.getBounds||!bounds.intersects(l.getBounds()))return;values.add(String(l.feature.properties[attr]??'Unknown'))});
+ if(values.size){markup+='<div class="legend-head">'+name+' · '+safe(attr)+'</div>';[...values].sort().slice(0,25).forEach(v=>markup+='<div class="legend-item"><i class="sw" style="background:'+color(v)+'"></i>'+safe(v)+'</div>');if(values.size>25)markup+='<div class="small">+'+(values.size-25)+' other visible categories</div>'}
+ }
+ el.innerHTML=markup||'<div class="small">No active layers in this view</div>';
+}
+// Defer setup until all data has been loaded by the original application.
+const ready=setInterval(()=>{if(!raw.MunicipalBoundary||!layers.MunicipalBoundary)return;clearInterval(ready);
+ homeBounds=layers.MunicipalBoundary.getBounds().pad(.04);
+ const Home=L.Control.extend({options:{position:'bottomright'},onAdd:function(){const c=L.DomUtil.create('div','leaflet-bar leaflet-control');const a=L.DomUtil.create('a','',c);a.href='#';a.title='Home — full municipality';a.setAttribute('aria-label','Home');a.innerHTML='⌂';a.style.cssText='font-size:25px;font-weight:bold;line-height:29px';L.DomEvent.on(a,'click',L.DomEvent.stop).on(a,'click',()=>map.fitBounds(homeBounds));return c}});map.addControl(new Home());
+ document.getElementById('siteCheck').onclick=nearestSite;
+ document.getElementById('siteClear').onclick=()=>{clearGraphics('site');document.getElementById('siteResult').textContent=''};
+ document.getElementById('roadQuery').oninput=updateRoadChoices;
+ document.getElementById('runBuffer').onclick=roadBuffer;
+ document.getElementById('clearBuffer').onclick=()=>{clearGraphics('buffer');document.getElementById('bufferResult').textContent=''};
+ map.on('moveend zoomend overlayadd overlayremove',visibleLegend);
+ document.getElementById('applyFilter').addEventListener('click',()=>setTimeout(visibleLegend,80));
+ document.getElementById('resetFilter').addEventListener('click',()=>setTimeout(visibleLegend,80));
+ document.getElementById('buildingStyle').addEventListener('change',()=>setTimeout(visibleLegend,80));
+ visibleLegend();
+},250);
+</script></body></html>

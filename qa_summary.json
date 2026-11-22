@@ -1,0 +1,44 @@
+{
+  "study_area": "Nuzividu / Nuzvid, Andhra Pradesh (from municipal attribute TN_NAME and spatial extent)",
+  "source_crs": "EPSG:32644",
+  "web_crs": "EPSG:4326",
+  "feature_counts": {
+    "Parcel": 15819,
+    "Buildings": 16658,
+    "RoadNetwork": 2133,
+    "RevenueWardBoundary": 25,
+    "Landmarks": 1142,
+    "MunicipalBoundary": 1
+  },
+  "invalid_after_processing": {
+    "Parcel": 0,
+    "Buildings": 0,
+    "RoadNetwork": 0,
+    "RevenueWardBoundary": 0,
+    "Landmarks": 0,
+    "MunicipalBoundary": 0
+  },
+  "open_land_candidate_count": 1904,
+  "open_land_candidate_area_sqm": 2658565.33,
+  "road_length_km_geometry": 266.01,
+  "parcel_landuse_top12": {
+    "Individual Residential House": 8821,
+    "Private Vacant Plot": 2862,
+    "Open Land": 1904,
+    "NA": 1008,
+    "Mix (Resd + Ind)": 509,
+    "Shops": 281,
+    "Public Worship": 76,
+    "Water Bodies": 60,
+    "Agriculture Land": 59,
+    "Any other": 48,
+    "Other Business Establishments": 33,
+    "State Govt. Properties": 29
+  },
+  "limitations": [
+    "No government ownership verification",
+    "No slum polygons or water network supplied",
+    "No genuine field photo/inspection evidence supplied",
+    "Candidate open land is not confirmed vacant or government-owned"
+  ]
+}
